@@ -302,6 +302,27 @@ test( 'convert to rotate -90 degrees', function (t) {
   t.end();
 });
 
+test( 'convert with background', function (t) {
+  var buffer = imagemagick.convert({
+    srcData: require('fs').readFileSync( "test.png" ),
+    background: '#0088ff',
+    format: 'JPEG',
+    quality: 100,
+    debug: debug
+  });
+
+  var results = imagemagick.getConstPixels({
+    srcData: buffer,
+    x: 1,
+    y: 1,
+    columns: 1,
+    rows: 1
+  });
+  console.log(results[0]);
+  t.equal( results[0].green, 65535, 'green is 65535' );
+  t.end();
+});
+
 test( 'identify invalid number of arguments', function (t) {
     var error = 0;
     try {
