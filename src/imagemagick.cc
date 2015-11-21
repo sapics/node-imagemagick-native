@@ -87,7 +87,7 @@ struct convert_im_ctx : im_ctx_base {
     std::string format;
     std::string filter;
     std::string blur;
-	std::string background;
+    std::string background;
     unsigned int quality;
     int rotate;
     int density;
@@ -497,6 +497,7 @@ void GeneratedBlobAfter(uv_work_t* req) {
 //                                         "Center", "East", "SouthWest", "South", "SouthEast", "None"
 //                  format:      optional. one of http://www.imagemagick.org/script/formats.php ex: "JPEG"
 //                  filter:      optional. ex: "Lagrange", "Lanczos". see ImageMagick's magick/option.c for candidates
+//                  background:  optional. ex: "white", "transparent", "#3E3E3E"
 //                  blur:        optional. ex: 0.8
 //                  strip:       optional. default: false. strips comments out from image.
 //                  maxMemory:   optional. set the maximum width * height of an image that can reside in the pixel cache memory.
@@ -568,7 +569,7 @@ NAN_METHOD(Convert) {
 
     Local<Value> formatValue = obj->Get( Nan::New<String>("format").ToLocalChecked() );
     context->format = !formatValue->IsUndefined() ?
-		*String::Utf8Value(formatValue) : "";
+        *String::Utf8Value(formatValue) : "";
 
     Local<Value> srcFormatValue = obj->Get( Nan::New<String>("srcFormat").ToLocalChecked() );
     context->srcFormat = !srcFormatValue->IsUndefined() ?
@@ -578,9 +579,9 @@ NAN_METHOD(Convert) {
     context->filter = !filterValue->IsUndefined() ?
         *String::Utf8Value(filterValue) : "";
 
-    Local<Value> backgroundValue = obj->Get( NanNew<String>("background") );
+    Local<Value> backgroundValue = obj->Get( Nan::New<String>("background").ToLocalChecked() );
     context->background = !backgroundValue->IsUndefined() ?
-        *NanAsciiString(backgroundValue) : "";
+        *String::Utf8Value(backgroundValue) : "";
 
     uv_work_t* req = new uv_work_t();
     req->data = context;
@@ -589,7 +590,7 @@ NAN_METHOD(Convert) {
 
         uv_queue_work(uv_default_loop(), req, DoConvert, (uv_after_work_cb)GeneratedBlobAfter);
 
-		return;
+        return;
     } else {
         DoConvert(req);
         RETURN_BLOB_OR_ERROR(req)
